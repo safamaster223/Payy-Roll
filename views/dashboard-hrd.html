@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRD Control Center - Enterprise Payroll</title>
+    <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body { background-color: #0b131a; color: #e2e8f0; min-height: 100vh; display: flex; }
+
+/* SIDEBAR STYLES */
+.sidebar { width: 260px; background-color: #111c24; padding: 30px 20px; border-right: 1px solid #1e2d3b; position: fixed; height: 100vh; }
+.sidebar h3 { color: #00f2fe; margin-bottom: 40px; text-align: center; font-size: 18px; letter-spacing: 1px; }
+.sidebar .menu-item { padding: 12px 15px; color: #94a3b8; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; font-size: 14px; }
+.sidebar .menu-item.active, .sidebar .menu-item:hover { background-color: #1e2d3b; color: #00f2fe; }
+
+/* MAIN LAYOUT STYLES */
+.main-content { flex: 1; margin-left: 260px; padding: 40px; overflow-y: auto; }
+.header-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.user-badge { background-color: #111c24; padding: 8px 16px; border-radius: 20px; font-size: 13px; border: 1px solid #1e2d3b; }
+
+/* GRID & CONTROLS */
+.grid-control { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 35px; }
+.form-card { background-color: #111c24; border: 1px solid #1e2d3b; border-radius: 12px; padding: 25px; }
+.form-card h3 { color: #00f2fe; margin-bottom: 15px; font-size: 16px; border-left: 4px solid #00f2fe; padding-left: 8px; }
+.form-row { margin-bottom: 12px; }
+label { display: block; font-size: 11px; text-transform: uppercase; color: #94a3b8; margin-bottom: 5px; }
+input, select { width: 100%; padding: 10px; background-color: #162530; border: 1px solid #1e2d3b; border-radius: 6px; color: white; outline: none; font-size: 13px; }
+
+/* BUTTONS */
+.btn-submit { width: 100%; padding: 10px; background: linear-gradient(45deg, #00c6ff, #0072ff); border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 5px; font-size: 13px; }
+.btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.action-card { background: linear-gradient(135deg, #111c24, #162530); border: 1px solid #1e2d3b; border-radius: 12px; padding: 25px; margin-bottom: 35px; display: flex; justify-content: space-between; align-items: center; }
+.btn-action { background: linear-gradient(45deg, #22c55e, #15803d); border: none; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.3s; }
+
+/* TABLES & CARDS */
+.section-card { background-color: #111c24; border: 1px solid #1e2d3b; border-radius: 12px; padding: 25px; margin-bottom: 35px; }
+.section-card h2 { font-size: 17px; margin-bottom: 20px; color: #f8fafc; border-left: 4px solid #00f2fe; padding-left: 10px; }
+
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+th { background-color: #162530; color: #00f2fe; padding: 12px 14px; font-weight: 600; text-transform: uppercase; font-size: 11px; border-bottom: 2px solid #1e2d3b; }
+td { padding: 12px 14px; color: #cbd5e1; border-bottom: 1px solid #1e2d3b; }
+
+/* DATA BADGES */
+.badge { padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+.badge-success { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+.badge-danger { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+.badge-warning { background-color: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #eab308; }
+
+/* MINI BUTTONS ACTION (FIXED CONTRAST & PADDING) */
+.btn-mini { 
+    padding: 6px 14px; 
+    border: none; 
+    border-radius: 6px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    color: #ffffff !important; 
+    transition: 0.2s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.btn-detail { background-color: #0072ff; box-shadow: 0 2px 8px rgba(0,114,255,0.3); }
+
+.btn-approve { 
+    background-color: #16a34a; 
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+    border: 1px solid #22c55e;
+}
+.btn-approve:hover { background-color: #15803d; transform: translateY(-1px); }
+
+.btn-reject { 
+    background-color: #dc2626; 
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+    border: 1px solid #ef4444;
+    margin-left: 4px;
+}
+.btn-reject:hover { background-color: #b91c1c; transform: translateY(-1px); }
+
+/* MODAL COUPLING PROFILE 360 SYSTEM STYLE */
+.modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+.modal-content { background-color: #111c24; border: 1px solid #1e2d3b; border-radius: 16px; padding: 30px; width: 100%; max-width: 550px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e2d3b; padding-bottom: 10px; }
+.modal-header h3 { color: #00f2fe; font-size: 18px; }
+.close-modal { color: #94a3b8; font-size: 20px; cursor: pointer; transition: 0.2s; }
+.close-modal:hover { color: #ef4444; }
+
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+.info-box { background-color: #162530; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02); }
+.info-box span { display: block; font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 3px; }
+.info-box p { font-size: 14px; font-weight: bold; color: white; }</style>
+</head>
+<body>
+
+    <div id="profileModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="mNamaKaryawan">Profil Komprehensif Karyawan</h3>
+                <span class="close-modal" onclick="tutupModal()">&times;</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-box"><span>Nomor Induk Karyawan (NIK)</span><p id="mNik">-</p></div>
+                <div class="info-box"><span>Jabatan Struktural</span><p id="mJabatan" style="color: #00f2fe;">-</p></div>
+            </div>
+            <div class="info-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="info-box"><span>Gaji Pokok / bln</span><p id="mGajiPokok" style="color: #4ade80;">-</p></div>
+                <div class="info-box"><span>Tunjangan</span><p id="mTunjangan">-</p></div>
+                <div class="info-box"><span>Estimasi Harian</span><p id="mGajiHarian">-</p></div>
+            </div>
+            <div class="info-grid">
+                <div class="info-box"><span>Username Login</span><p id="mUsername">-</p></div>
+                <div class="info-box"><span>Hak Akses Portal</span><p id="mRole">-</p></div>
+            </div>
+            <div style="margin: 15px 0 10px 0; font-size: 12px; color: #00f2fe; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Statistik Kehadiran & Finansial Historis (6 Tabel VIEW)</div>
+            <div class="info-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="info-box" style="border-color: #22c55e;"><span>Total Masuk</span><p id="mHadir" style="color: #4ade80;">-</p></div>
+                <div class="info-box" style="border-color: #ef4444;"><span>Total Alpa</span><p id="mAlpa" style="color: #f87171;">-</p></div>
+                <div class="info-box" style="border-color: #00c6ff;"><span>Slip Bersih Terakhir</span><p id="mGajiTerakhir" style="color: #00c6ff;">-</p></div>
+            </div>
+            <div class="info-box" style="margin-top: 10px; background-color: rgba(0, 242, 254, 0.03); border: 1px dashed #00f2fe;">
+                <span>Aktivitas Live Attendance & Snapshot Potongan Transaksi</span>
+                <p id="mTapMesin" style="font-size:13px; font-weight: 500;">0 Kali melakukan tap kartu absen. Snapshot denda potongan terakhir: Rp 0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <h3>PAYROLL SYSTEM</h3>
+        <div class="menu-item active">Dashboard HRD Pro</div>
+        <div class="menu-item" onclick="window.location.href='/'">Keluar Sistem</div>
+    </div>
+
+    <div class="main-content">
+        <div class="header-title">
+            <h1>Panel Administrasi HRD Enterprise</h1>
+            <div class="user-badge">Role: <b>Admin HR</b></div>
+        </div>
+
+                <div class="grid-control" style="grid-template-columns: 1fr 1fr 1fr;">
+            
+            <div class="form-card">
+                <h3>Registrasi Karyawan & User Baru</h3>
+                <form id="addKaryawanForm">
+                    <div class="form-row"><label>Nama Lengkap</label><input type="text" id="addNama" required placeholder="Alghifari Amar"></div>
+                    <div class="form-row"><label>Nomor NIK</label><input type="text" id="addNik" required placeholder="NIK2026004"></div>
+                    <div class="form-row"><label>Pilih Jabatan Perusahaan</label><select id="selectJabatan" required></select></div>
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-row"><label>Username</label><input type="text" id="addUsername" required placeholder="user_baru"></div>
+                        <div class="form-row"><label>Password</label><input type="password" id="addPassword" required placeholder="pass123"></div>
+                    </div>
+                    <button type="submit" class="btn-submit">DAFTARKAN KARYAWAN</button>
+                </form>
+            </div>
+
+            <div class="form-card">
+                <h3>Ubah Skema Gaji Jabatan</h3>
+                <form id="updateGajiForm">
+                    <div class="form-row"><label>Pilih Jabatan</label><select id="selectJabatanEdit" required></select></div>
+                    <div class="form-row"><label>Gaji Pokok Baru (Rupiah)</label><input type="number" id="gajiBaruInput" required placeholder="9500000"></div>
+                    <p style="font-size:11px; color:#94a3b8; margin-bottom:20px; font-style:italic;">*Aksi memicu database TRIGGER log audit.</p>
+                    <button type="submit" class="btn-submit" style="background: linear-gradient(45deg, #ec4899, #8b5cf6);">PERBARUI & PICU TRIGGER</button>
+                </form>
+            </div>
+
+            <div class="form-card" style="border-color: #eab308;">
+                <h3 style="color: #fde047; border-left-color: #eab308;">Konfigurasi Parameter Keuangan</h3>
+                <form id="updateConfigForm">
+                    <div class="form-row">
+                        <label>Pilih Jenis Kebijakan Finansial</label>
+                        <select id="selectParamName" required>
+                            <option value="TARIF_LEMBUR_PER_JAM">Upah Lembur per Jam</option>
+                            <option value="DENDA_ALPA_PER_HARI">Potongan Alpa per Hari</option>
+                            <option value="DENDA_TERLATM_PER_10_MENIT">Denda Telat per 10 Menit</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Nominal Aturan Baru (Rupiah)</label>
+                        <input type="number" id="configValueInput" required placeholder="20000" min="0">
+                    </div>
+                    <p style="font-size:11px; color:#94a3b8; margin-bottom:20px; font-style:italic;">*Perubahan langsung mengubah nilai kalkulasi rumus Stored Procedure.</p>
+                    <button type="submit" class="btn-submit" style="background: linear-gradient(45deg, #eab308, #ca8a04);">SIMPAN ATURAN REGULASI</button>
+                </form>
+            </div>
+
+        </div>
+        <div class="section-card">
+            <h2>Persetujuan Pengajuan Lembur Karyawan</h2>
+            <table id="lemburTable">
+                <thead><tr><th>Nama Karyawan</th><th>Tanggal Lembur</th><th>Durasi</th><th>Keterangan Alasan</th><th>Status</th><th>Tindakan HRD</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="action-card">
+            <div>
+                <h3 style="color: #22c55e; font-size:15px; margin-bottom:4px;">Kalkulasi Penggajian Massal Berjalan</h3>
+                <p style="color: #94a3b8; font-size: 13px;">Menghitung seluruh komponen gaji via <b>Stored Procedure + Cursor</b>.</p>
+            </div>
+            <button class="btn-action" id="btnHitungGaji">HITUNG GAJI MEI 2026</button>
+        </div>
+
+        <div class="section-card">
+            <h2>Daftar Karyawan Aktif (Master Data)</h2>
+            <table id="employeeTable">
+                <thead><tr><th>ID</th><th>NIK</th><th>Nama Lengkap</th><th>Jabatan</th><th>Profil Lengkap</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="section-card">
+            <h2>Rincian Dokumen Penggajian Terkalkulasi (Database VIEW)</h2>
+            <table id="payrollReportTable">
+                <thead><tr><th>ID Slip</th><th>Nama Karyawan</th><th>Komponen</th><th>Kategori</th><th>Nominal</th><th>Total Bersih</th><th>Status</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // FUNGSI UTAMA: Memanggil Data Profil Lengkap dari Super-VIEW gaya WHERE
+        // Fungsi Panggil Pop-up Modal Detail Karyawan (VERSI AMAN - ANTI CRASH)
+// Fungsi Panggil Pop-up Modal Detail Karyawan (VERSI SINKRON & AMAN DARI CRASH)
+async function bukaDetailProfil(idKaryawan) {
+    try {
+        const res = await fetch(`/api/hrd/employee-detail/${idKaryawan}`);
+        
+        if (!res.ok) {
+            alert('Gagal mengambil data dari server backend.');
+            return;
+        }
+        
+        const data = await res.json();
+        
+        if(data) {
+            // 1. Pemetaan Teks Dasar (Pastikan ID ini sesuai dengan elemen HTML Modal)
+            document.getElementById('mNamaKaryawan').textContent = `Profil Komprehensif: ${data.Nama_Karyawan || 'Tanpa Nama'}`;
+            document.getElementById('mNik').textContent = data.NIK || '-';
+            document.getElementById('mJabatan').textContent = data.Jabatan || '-';
+            
+            // 2. Amankan konversi angka matematika (Picu fallback 0 jika null/empty)
+            const gajiPokok = parseFloat(data.Gaji_Pokok) || 0;
+            const tunjangan = parseFloat(data.Tunjangan) || 0;
+            const gajiHarian = parseFloat(data.Gaji_Harian_Estimasi) || 0;
+            const gajiTerakhir = parseFloat(data.Gaji_Terakhir_Diterima) || 0;
+            const dendaTerakhir = parseFloat(data.Snapshot_Denda_Terakhir) || 0;
+
+            document.getElementById('mGajiPokok').textContent = `Rp ${gajiPokok.toLocaleString('id-ID')}`;
+            document.getElementById('mTunjangan').textContent = `Rp ${tunjangan.toLocaleString('id-ID')}`;
+            document.getElementById('mGajiHarian').textContent = `Rp ${gajiHarian.toLocaleString('id-ID')}`;
+            
+            document.getElementById('mUsername').textContent = data.Username_Sistem || 'Belum Di-set';
+            document.getElementById('mRole').textContent = data.Hak_Akses || '-';
+            
+            document.getElementById('mHadir').textContent = `${data.Total_Masuk_Bulan_Ini || 0} Hari`;
+            document.getElementById('mAlpa').textContent = `${data.Total_Alpa_Bulan_Ini || 0} Hari`;
+            
+            // [FIXED ID] Kita tembak ke ID 'mGajiTerakhir' yang ada di modal HTML
+            // Note: Jika di HTML namanya 'mGajiTerakhir', pastikan elemen <p id="mGajiTerakhir"> ada di dalam div modal!
+            const targetGajiBox = document.getElementById('mGajiTerakhir') || document.getElementById('mLembur');
+            if(targetGajiBox) {
+                targetGajiBox.textContent = `Rp ${gajiTerakhir.toLocaleString('id-ID')}`;
+            }
+
+            // Update info pelengkap teks tap mesin
+            const targetTapBox = document.getElementById('mTapMesin');
+            if(targetTapBox) {
+                targetTapBox.textContent = `${data.Total_Tap_Absen_Mesin || 0} Kali melakukan tap kartu absen harian di kantor. Snapshot denda terakhir: Rp ${dendaTerakhir.toLocaleString('id-ID')}`;
+            }
+
+            // MEMUNCULKAN POP-UP MODAL SECARA INSTAN
+            document.getElementById('profileModal').style.display = 'flex';
+        }
+    } catch (err) { 
+        console.error('Detail Error QA:', err);
+        alert('JavaScript Frontend Crash: ' + err.message); 
+    }
+}
+        function tutupModal() { document.getElementById('profileModal').style.display = 'none'; }
+
+        // Fungsi pendukung manajemen database (CRUD & Event handlers)
+        async function loadJabatanDropdowns() {
+            const res = await fetch('/api/hrd/jabatans'); const jabatans = await res.json();
+            const s1 = document.getElementById('selectJabatan'); const s2 = document.getElementById('selectJabatanEdit');
+            s1.innerHTML = ''; s2.innerHTML = '';
+            jabatans.forEach(j => { const opt = `<option value="${j.id_jabatan}">${j.nama_jabatan} (Rp ${parseFloat(j.gaji_pokok).toLocaleString('id-ID')})</option>`; s1.innerHTML += opt; s2.innerHTML += opt; });
+        }
+
+        document.getElementById('addKaryawanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = { nama: document.getElementById('addNama').value, nik: document.getElementById('addNik').value, id_jabatan: document.getElementById('selectJabatan').value, username: document.getElementById('addUsername').value, password: document.getElementById('addPassword').value };
+            const res = await fetch('/api/hrd/add-karyawan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if((await res.json()).success) { alert('🎉 Sukses!'); location.reload(); }
+        });
+
+        document.getElementById('updateGajiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = { id_jabatan: document.getElementById('selectJabatanEdit').value, gaji_baru: document.getElementById('gajiBaruInput').value };
+            const res = await fetch('/api/hrd/update-gaji', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if((await res.json()).success) { alert('🔥 Sukses Gaji Diupdate!'); loadJabatanDropdowns(); }
+        });
+
+       // Fungsi Load List Lemburan (FIXED: Tombol ACC & TOLAK Anti-Adios!)
+    async function loadLemburRequests() {
+        try {
+            const response = await fetch('/api/hrd/list-lembur');
+            const list = await response.json();
+            const tbody = document.querySelector('#lemburTable tbody'); 
+            tbody.innerHTML = '';
+            
+            if(list.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #94a3b8;">Tidak ada riwayat pengajuan lemburan.</td></tr>'; 
+                return; 
+            }
+            
+            list.forEach(item => {
+                // 1. Amankan pengecekan string status (Ubah ke huruf kecil/uppercase sesuai DB)
+                const statusTrimmed = item.status_approval ? item.status_approval.trim() : 'Pending';
+                
+                let badgeClass = 'badge-warning';
+                if(statusTrimmed === 'Approved') badgeClass = 'badge-success';
+                if(statusTrimmed === 'Rejected') badgeClass = 'badge-danger';
+
+                // 2. Koreksi Logika Tombol Aksi: Pastikan string 'Pending' cocok 100%
+             let actionButtons = '';
+if (statusTrimmed === 'Pending') {
+    // Kita bungkus pakai div flexbox biar otomatis berjejer kanan-kiri dan rapi!
+    actionButtons = `
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <button class="btn-mini btn-approve" onclick="actionLembur(${item.id_lembur}, 'Approved')">APPROVE</button>
+            <button class="btn-mini btn-reject" onclick="actionLembur(${item.id_lembur}, 'Rejected')">REJECT</button>
+        </div>
+    `;
+}  else {
+                    actionButtons = `<span style="color:#64748b; font-size: 12px; font-style: italic;">Selesai di-Review</span>`;
+                }
+
+                // 3. Inject baris baru ke dalam tabel HTML
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${item.nama_karyawan}</b></td>
+                        <td>${new Date(item.tanggal_lembur).toLocaleDateString('id-ID')}</td>
+                        <td><span style="color: #00f2fe; font-weight: bold;">${item.durasi_jam} Jam</span></td>
+                        <td><i style="color:#94a3b8;">"${item.keterangan}"</i></td>
+                        <td><span class="badge ${badgeClass}">${statusTrimmed}</span></td>
+                        <td>${actionButtons}</td>
+                    </tr>
+                `;
+            });
+        } catch (err) { 
+            console.error('Gagal memuat list lemburan:', err); 
+        }
+    }
+        async function actionLembur(id, status) {
+            const res = await fetch('/api/hrd/action-lembur', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_lembur: id, status_baru: status }) });
+            if((await res.json()).success) { loadLemburRequests(); }
+        }
+
+        async function loadEmployees() {
+            const response = await fetch('/api/hrd/employees'); const employees = await response.json();
+            const tbody = document.querySelector('#employeeTable tbody'); tbody.innerHTML = '';
+            employees.forEach(emp => { 
+                tbody.innerHTML += `<tr><td><b>#${emp.id_karyawan}</b></td><td>${emp.nik}</td><td>${emp.nama_karyawan}</td><td><span style="color: #00f2fe;">${emp.nama_jabatan}</span></td><td><button class="btn-mini btn-detail" onclick="bukaDetailProfil(${emp.id_karyawan})">VIEW PROFILE</button></td></tr>`; 
+            });
+        }
+
+        async function loadPayrollReport() {
+            const response = await fetch('/api/hrd/payroll-report'); const reports = await response.json();
+            const tbody = document.querySelector('#payrollReportTable tbody'); tbody.innerHTML = '';
+            reports.forEach(rep => {
+                const badgeClass = rep.Kategori === 'Pendapatan' ? 'badge-success' : 'badge-danger';
+                tbody.innerHTML += `<tr><td><b>SLP-${rep.ID_Slip}</b></td><td>${rep.Nama_Karyawan}</td><td>${rep.Komponen_Gaji}</td><td><span class="badge ${badgeClass}">${rep.Kategori}</span></td><td>Rp ${parseFloat(rep.Nominal).toLocaleString('id-ID')}</td><td style="color: #00f2fe; font-weight: 600;">Rp ${parseFloat(rep.Total_Gaji_Bersih).toLocaleString('id-ID')}</td><td><span class="badge" style="background-color: #1e2d3b; color: #cbd5e1">${rep.Status_Bayar}</span></td></tr>`;
+            });
+        }
+
+        document.getElementById('btnHitungGaji').addEventListener('click', async () => {
+            const btn = document.getElementById('btnHitungGaji'); btn.textContent = 'MEMPROSES...'; btn.disabled = true;
+            const response = await fetch('/api/hrd/generate-payroll', { method: 'POST' });
+            if((await response.json()).success) { alert('🎉 Gaji Massal Sukses Dihitung!'); loadPayrollReport(); }
+            btn.textContent = 'HITUNG GAJI MEI 2026'; btn.disabled = false;
+        });
+
+        loadJabatanDropdowns(); loadLemburRequests(); loadEmployees(); loadPayrollReport();
+    // Handle Form Update Parameter Konfigurasi Global Finansial
+document.getElementById('updateConfigForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = {
+        param_name: document.getElementById('selectParamName').value,
+        nilai_baru: document.getElementById('configValueInput').value
+    };
+
+    const res = await fetch('/api/hrd/update-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if(data.success) {
+        alert('💰 Aturan Finansial Berhasil Diperbarui!\n' + data.message);
+        document.getElementById('configValueInput').value = '';
+    }
+});
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Portal - Secure ESS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0b131a; color: #e2e8f0; min-height: 100vh; display: flex; }
+        
+        .sidebar { width: 260px; background-color: #111c24; padding: 30px 20px; border-right: 1px solid #1e2d3b; }
+        .sidebar h3 { color: #00f2fe; margin-bottom: 40px; text-align: center; font-size: 18px; letter-spacing: 1px; }
+        .sidebar .menu-item { padding: 12px 15px; color: #94a3b8; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; font-size: 14px; }
+        .sidebar .menu-item.active, .sidebar .menu-item:hover { background-color: #1e2d3b; color: #00f2fe; font-weight: 500; }
+
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .header-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .network-badge { background-color: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #4ade80; padding: 6px 14px; border-radius: 30px; font-size: 12px; }
+
+        .absensi-panel { background: linear-gradient(135deg, #111c24, #162530); border: 1px solid #1e2d3b; padding: 25px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-attendance { padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; font-size: 13px; }
+        .btn-checkin { background: #22c55e; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+        .btn-lembur { background: #0072ff; box-shadow: 0 4px 12px rgba(0,114,255,0.3); margin-left: 10px; }
+        .btn-attendance:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .grid-widgets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .widget-card { background-color: #111c24; border: 1px solid #1e2d3b; padding: 20px; border-radius: 12px; }
+        .widget-card p { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .widget-card h3 { font-size: 22px; color: #fff; }
+
+        .section-card { background-color: #111c24; border: 1px solid #1e2d3b; border-radius: 12px; padding: 25px; }
+        .section-card h2 { font-size: 16px; margin-bottom: 20px; color: #f8fafc; border-left: 4px solid #00f2fe; padding-left: 10px; }
+        
+        .filter-container { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
+        select { background-color: #162530; color: #fff; border: 1px solid #1e2d3b; padding: 8px 14px; border-radius: 6px; outline: none; font-size: 13px; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: #162530; color: #00f2fe; padding: 14px 16px; font-weight: 600; border-bottom: 2px solid #1e2d3b; font-size: 12px; text-transform: uppercase; }
+        td { padding: 14px 16px; color: #cbd5e1; border-bottom: 1px solid #1e2d3b; }
+        
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+        .badge-success { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .badge-danger { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h3>ENTERPRISE ESS</h3>
+        <div class="menu-item active">Portal Kendali Mandiri</div>
+        <div class="menu-item" onclick="window.location.href='/'">Keluar</div>
+    </div>
+
+    <div class="main-content">
+        <div class="header-title">
+            <h1>Portal Karyawan: Alghifari Amar</h1>
+            <div class="network-badge">🟢 Secure Network Terverifikasi</div>
+        </div>
+
+        <div class="absensi-panel">
+            <div>
+                <h3 style="color: #00f2fe; margin-bottom: 5px; font-size: 16px;">Sistem Kehadiran Terkunci IP Kantor</h3>
+                <p style="color: #94a3b8; font-size: 13px;">Sistem memvalidasi koneksi internet Anda secara real-time untuk mencegah fraud.</p>
+            </div>
+            <div>
+                <button class="btn-attendance btn-checkin" onclick="jalankanCheckin()">CHECK-IN LIVE</button>
+                <button class="btn-attendance btn-lembur" onclick="bukaFormLembur()">AJUKAN LEMBURAN</button>
+            </div>
+        </div>
+
+        <div class="grid-widgets">
+            <div class="widget-card">
+                <p>Total Jam Lembur Disetujui</p>
+                <h3 style="color: #00f2fe;">10 Jam</h3>
+            </div>
+            <div class="widget-card">
+                <p>Kuota Cuti Tersisa</p>
+                <h3 style="color: #eab308;">12 Hari</h3>
+            </div>
+            <div class="widget-card">
+                <p>Total Bersih Diterima (THP)</p>
+                <h3 style="color: #22c55e;" id="totalGajiText">Rp 0</h3>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2>Riwayat Dokumen Penggajian Finansial</h2>
+            
+            <div class="filter-container">
+                <select id="selectBulan" onchange="loadMySlipHistoris()">
+                    <option value="5" selected>Mei</option>
+                    <option value="4">April</option>
+                    <option value="3">Maret</option>
+                </select>
+                <select id="selectTahun" onchange="loadMySlipHistoris()">
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+
+            <table id="slipTable">
+                <thead>
+                    <tr>
+                        <th>Komponen Slip Gaji</th>
+                        <th>Kategori</th>
+                        <th>Nominal Kompensasi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="3" style="text-align: center; color: #94a3b8;">Memuat data slip...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Load data slip gaji historis terproteksi header
+        async function loadMySlipHistoris() {
+            const bln = document.getElementById('selectBulan').value;
+            const thn = document.getElementById('selectTahun').value;
+            
+            try {
+                const response = await fetch(`/api/karyawan/my-slip/${bln}/${thn}`, {
+                    headers: { 'x-user-role': 'Karyawan' } // Mock Token Proteksi Akses
+                });
+                const data = await response.json();
+                
+                const tbody = document.querySelector('#slipTable tbody');
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8;">Tidak ada data transaksi payroll pada periode ini.</td></tr>';
+                    document.getElementById('totalGajiText').textContent = "Rp 0";
+                    return;
+                }
+
+                document.getElementById('totalGajiText').textContent = `Rp ${parseFloat(data[0].Total_Gaji_Bersih).toLocaleString('id-ID')}`;
+                tbody.innerHTML = '';
+                
+                data.forEach(item => {
+                    const badge = item.Kategori === 'Pendapatan' ? 'badge-success' : 'badge-danger';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${item.Komponen_Gaji}</b></td>
+                            <td><span class="badge ${badge}">${item.Kategori}</span></td>
+                            <td>Rp ${parseFloat(item.Nominal).toLocaleString('id-ID')}</td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Jalankan Check-in Aman
+        a// Fungsi Pemicu Jalankan Check-in Aman Kelas Kakap
+    async function jalankanCheckin() {
+        const btn = document.querySelector('.btn-checkin');
+        
+        try {
+            const res = await fetch('/api/karyawan/checkin', { method: 'POST' });
+            const data = await res.json();
+            
+            alert(data.message);
+            
+            // Jika server mendeteksi sudah absen hari ini, gembok tombolnya live di layar!
+            if (data.alreadyCheckedIn) {
+                btn.textContent = '🔒 CHECK-IN DIKUNCI (SUDAH ABSEN)';
+                btn.style.background = '#475569'; // Ubah jadi warna abu-abu mati
+                btn.style.boxShadow = 'none';
+                btn.disabled = true; // Matikan fungsi interaksi tombol
+            }
+            
+            // Refresh tabel slip jika ada pembaruan kalkulasi
+            loadMySlipHistoris();
+        } catch (err) {
+            alert('Gagal terkoneksi ke jaringan server.');
+        }
+    }
+
+        // Ajukan Lemburan Dialog
+        async function bukaFormLembur() {
+            const tgl = prompt('Masukkan Tanggal Lembur (YYYY-MM-DD):', '2026-05-23');
+            const jam = prompt('Masukkan Jumlah Durasi (Jam):', '4');
+            const ket = prompt('Masukkan Alasan / Keterangan Lembur:', 'Perbaikan Bug API Dashboard');
+            
+            if(!tgl || !jam || !ket) return;
+
+            try {
+                const res = await fetch('/api/karyawan/ajukan-lembur', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tanggal: tgl, jam: jam, keterangan: ket })
+                });
+                const data = await res.json();
+                if(data.success) alert('🎉 ' + data.message);
+            } catch (err) {
+                alert('Gagal mengirim formulir.');
+            }
+        }
+
+        loadMySlipHistoris();
+    </script>
+</body>
+</html>

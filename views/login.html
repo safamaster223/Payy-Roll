@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Payroll System - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        h2 { text-align: center; margin-bottom: 10px; font-weight: 600; letter-spacing: 1px; color: #00f2fe; }
+        p.subtitle { text-align: center; font-size: 13px; color: #ccc; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: #00f2fe; }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #00f2fe; box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
+        btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 198, 255, 0.4); }
+        .alert {
+            padding: 10px;
+            background: rgba(255, 75, 75, 0.2);
+            border: 1px solid #ff4b4b;
+            color: #ff8888;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>PAYROLL SYSTEM</h2>
+    <p class="subtitle">Silakan login ke akun Anda</p>
+    
+    <div id="errorAlert" class="alert"></div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Masukkan username..." required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Masukkan password..." required>
+        </div>
+        <button type="submit" class="btn-login">MASUK SISTEM</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const alertBox = document.getElementById('errorAlert');
+
+        alertBox.style.display = 'none';
+
+        try {
+            // Mengirim data login ke API backend menggunakan fetch modern
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('🎉 ' + data.message);
+                // Logika pengalihan halaman berdasarkan role dari database
+                if (data.role === 'Admin HR') {
+                    window.location.href = '/dashboard-hrd';
+                } else {
+                    window.location.href = '/dashboard-karyawan';
+                }
+            } else {
+                alertBox.textContent = data.message;
+                alertBox.style.display = 'block';
+            }
+        } catch (err) {
+            alertBox.textContent = 'Gagal terhubung ke server.';
+            alertBox.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>

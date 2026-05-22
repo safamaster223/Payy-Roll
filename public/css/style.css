@@ -1,0 +1,45 @@
+/* Premium Color Variables & Core Styles */
+:root {
+    --bg-dark: #0b131a;
+    --sidebar-bg: #111c24;
+    --border-color: #1e2d3b;
+    --neon-blue: #00f2fe;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --grad-blue: linear-gradient(45deg, #00c6ff, #0072ff);
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Reusable UI Components */
+.card-premium {
+    background: linear-gradient(135deg, var(--sidebar-bg), #162530);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.table-premium {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-premium th {
+    background-color: #162530;
+    color: var(--neon-blue);
+    padding: 14px 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.table-premium td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
